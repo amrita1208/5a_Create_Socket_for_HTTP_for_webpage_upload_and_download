@@ -16,6 +16,84 @@ To write a PYTHON program for socket for HTTP for web page upload and download
 6.Stop the program
 <BR>
 ## Program 
+
+## server:
+
+```
+import socket
+
+s = socket.socket()
+s.bind(("localhost",8080))
+s.listen(1)
+
+print("Server running...")
+
+while True:
+    c,addr = s.accept()
+    
+    request = c.recv(1024).decode()
+    print("Request received")
+
+    if "GET" in request:
+        f = open("index.html","r")
+        data = f.read()
+        f.close()
+
+        response = "HTTP/1.1 200 OK\n\n" + data
+        c.send(response.encode())
+
+    elif "POST" in request:
+        data = request.split("\n\n")[1]
+
+        f = open("upload.txt","w")
+        f.write(data)
+        f.close()
+
+        c.send("HTTP/1.1 200 OK\n\nFile Uploaded".encode())
+
+    c.close()
+
+```
+## client:
+
+```
+import socket
+
+s = socket.socket()
+s.connect(("localhost",8080))
+
+ch = input("1.Download 2.Upload : ")
+
+# Download webpage
+if ch == "1":
+    req = "GET / HTTP/1.1\nHost: localhost\n\n"
+    s.send(req.encode())
+
+    data = s.recv(4096)
+    print(data.decode())
+
+# Upload file
+else:
+    msg = input("Enter data to upload: ")
+
+    req = "POST / HTTP/1.1\nHost: localhost\n\n" + msg
+    s.send(req.encode())
+
+    data = s.recv(1024)
+    print(data.decode())
+
+s.close()
+```
 ## OUTPUT
+
+## server:
+
+<img width="1561" height="887" alt="Screenshot 2026-03-17 144148" src="https://github.com/user-attachments/assets/4a3aa416-6ac9-4d6a-b02f-3f59df48d7e3" />
+
+## client:
+
+<img width="1556" height="1014" alt="Screenshot 2026-03-17 144213" src="https://github.com/user-attachments/assets/d9840afd-73ff-4b9e-b145-211c46bb27c2" />
+
+
 ## Result
 Thus the socket for HTTP for web page upload and download created and Executed
